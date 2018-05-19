@@ -1,0 +1,54 @@
+#!/bin/bash
+
+hab pkg install chef/ci-studio-common >/dev/null
+source "$(hab pkg path chef/ci-studio-common)/bin/studio-common"
+
+install_if_missing core/curl curl
+
+export REDIS_PORT=6379;
+export REQUESTBIN_PORT=8080;
+
+function start() {
+  install_if_missing core/busybox-static netstat;
+  netstat -an | grep $REQUESTBIN_PORT | grep LISTEN >/dev/null 2>/dev/null
+  if [ $? == 0 ]; then
+    echo "requestbin is already running";
+    return;
+  fi
+
+  start_sup
+
+  start_redis
+
+  build
+  
+  mkdir -p /hab/user/requestbin/config/
+
+  printf "[http.listen]\nport = $REQUESTBIN_PORT" > /hab/user/requestbin/config/user.toml
+
+  hab start $HAB_ORIGIN/requestbin
+
+  wait_or_fail_for_port_to_listen $REQUESTBIN_PORT
+}
+
+function start_redis() {
+  install_if_missing core/busybox-static netstat;
+  netstat -an | grep $REDIS_PORT | grep LISTEN >/dev/null 2>/dev/null
+  if [ $? == 0 ]; then
+    echo "redis is already running";
+    return;
+  fi
+
+  start_sup
+
+  mkdir -p /hab/user/redis/config/
+
+  echo "port = $REDIS_PORT" > /hab/user/redis/config/user.toml
+
+  hab start core/redis
+
+  wait_or_fail_for_port_to_listen $REDIS_PORT
+}
+
+
+eval "$(curl -s -L https://gist.githubusercontent.com/lancewf/6b58d3accb36c2ae5681a40bd574b124/raw/345232f9fab0bb2892be15419bc5e644e55f0d9c/hab_studio_addition)"

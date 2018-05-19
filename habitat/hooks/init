@@ -1,0 +1,5 @@
+#!/bin/bash
+exec 2>&1
+
+cp -R {{pkg.path}}/app {{pkg.svc_data_path}}
+cp {{pkg.svc_config_path}}/config.py {{pkg.svc_data_path}}/app/requestbin/.
