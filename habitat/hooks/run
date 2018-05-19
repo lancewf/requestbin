@@ -1,9 +1,11 @@
 #!/bin/bash
 exec 2>&1
 
+cd {{pkg.svc_data_path}}/app/
+source venv/bin/activate
 {{#if cfg.http.listen.local_only ~}}
-{{pkg.svc_data_path}}/app/venv/bin/gunicorn --bind 127.0.0.1:{{cfg.http.listen.port}} --worker-class gevent --workers 2 --max-requests 1000 requestbin:app
+venv/bin/gunicorn --bind 127.0.0.1:{{cfg.http.listen.port}} --worker-class gevent --workers 2 --max-requests 1000 requestbin:app
 {{else ~}}
-{{pkg.svc_data_path}}/app/venv/bin/gunicorn --bind 0.0.0.0:{{cfg.http.listen.port}} --worker-class gevent --workers 2 --max-requests 1000 requestbin:app
+venv/bin/gunicorn --bind 0.0.0.0:{{cfg.http.listen.port}} --worker-class gevent --workers 2 --max-requests 1000 requestbin:app
 {{/if ~}}
 
