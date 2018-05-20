@@ -26,7 +26,7 @@ function start() {
 
   printf "[http.listen]\nport = $REQUESTBIN_PORT" > /hab/user/requestbin/config/user.toml
 
-  hab start $HAB_ORIGIN/requestbin
+  hab start $HAB_ORIGIN/requestbin --bind redis:redis.default
 
   wait_or_fail_for_port_to_listen $REQUESTBIN_PORT
 }

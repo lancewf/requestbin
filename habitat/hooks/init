@@ -1,5 +1,23 @@
 #!/bin/bash
 exec 2>&1
 
+############# Connect to redis #############################
+redis_ready() {
+    echo "redis-cli -p {{bind.redis.first.cfg.port}} ping"
+    local expected="PONG"
+    local actual=$(redis-cli -p {{bind.redis.first.cfg.port}} ping)
+    if [ "$actual" == "$expected" ]
+    then
+        return 0
+    else
+        return 1
+    fi
+}
+
+if !(redis_ready) then
+     echo "waiting for redis ..."
+     exit 1
+fi
+
 cp -R {{pkg.path}}/app {{pkg.svc_data_path}}
 cp {{pkg.svc_config_path}}/config.py {{pkg.svc_data_path}}/app/requestbin/.

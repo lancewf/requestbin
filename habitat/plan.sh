@@ -4,7 +4,7 @@ pkg_version="0.1.0"
 pkg_maintainer="Lance Finfrock <lfinfrock@chef.io>"
 pkg_license=('Apache-2.0')
 pkg_source=""
-pkg_deps=(core/coreutils core/python2)
+pkg_deps=(core/coreutils core/python2 core/redis)
 pkg_build_deps=(core/virtualenv core/gcc)
 
 pkg_svc_user=root
@@ -16,7 +16,7 @@ pkg_exports=(
 )
 
 pkg_binds=(
-
+  [redis]="port"
 )
 
 do_unpack() {

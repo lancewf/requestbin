@@ -1,6 +1,21 @@
-# Use this file to templatize your application's native configuration files.
-# See the docs at https://www.habitat.sh/docs/create-packages-configure/.
-# You can safely delete this file if you don't need it.
+flask_session_secret_key = "N1BKhJLnBqLpexOZdklsfDKFJDKFadsfs9a3r324YB7B73AglRmrHMDQ9RhXz35"
+max_requests = 20
+cleanup_interval = 3600
+max_raw_size = 10240
+bin_ttl = 172800
+enable_cors = "False"
+cors_origins = "*"
+debug = "False"
+ignore_headers = ['X-Varnish','X-Forwarded-For','X-Heroku-Dynos-In-Use','X-Request-Start','X-Heroku-Queue-Wait-Time','X-Heroku-Queue-Depth','X-Real-Ip','X-Forwarded-Proto','X-Via','X-Forwarded-Port']
+bugsnag_key = ""
+# 'local' or 'prod'
+realm = "local"
+
+[redis]
+db = 9
+prefix = "requestbin"
+
 [http.listen]
 port = 8080
 local_only = false
+
