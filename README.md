@@ -52,6 +52,17 @@ $ sudo docker-compose up -d
 
 Your own private RequestBin will be running on this server.
 
+## Deploy your own instance using Habitat.sh
+
+On the server/machine you want to host this, you'll first need a machine with
+Habitat.sh installed, then run the below commands:
+
+```
+hab svc load lancewf/redis
+hab svc load lancewf/requestbin --bind redis:redis.default
+```
+
+Your own private RequestBin will be running on port 8080.
 
 Contributors
 ------------

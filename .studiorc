@@ -43,9 +43,9 @@ function start_redis() {
 
   mkdir -p /hab/user/redis/config/
 
-  echo "port = $REDIS_PORT" > /hab/user/redis/config/user.toml
+  printf "port = $REDIS_PORT\n" > /hab/user/redis/config/user.toml
 
-  hab start core/redis
+  hab start lancewf/redis
 
   wait_or_fail_for_port_to_listen $REDIS_PORT
 }

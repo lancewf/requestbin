@@ -16,7 +16,7 @@ pkg_exports=(
 )
 
 pkg_binds=(
-  [redis]="port"
+  [redis]="port local_only"
 )
 
 do_unpack() {
