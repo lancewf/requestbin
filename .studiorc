@@ -1,34 +1,33 @@
 #!/bin/bash
 
-hab pkg install chef/ci-studio-common >/dev/null
-source "$(hab pkg path chef/ci-studio-common)/bin/studio-common"
+hab pkg install chef/studio-common >/dev/null
+source "$(hab pkg path chef/studio-common)/bin/studio-common"
 
 install_if_missing core/curl curl
 
+eval "$(curl -s -L https://gist.githubusercontent.com/lancewf/3117853c8c5a04c7b01bac737887a30c/raw/375644621d44f2d638a4e3ab9cc2cbfb1b3d41d5/hab_helpers.sh)"
+source <(curl -s https://gist.githubusercontent.com/lancewf/3117853c8c5a04c7b01bac737887a30c/raw/375644621d44f2d638a4e3ab9cc2cbfb1b3d41d5/hab_helpers.sh)
+
+eval "$(curl -s -L https://gist.githubusercontent.com/lancewf/584ca17c7b50cfc859e7cf544c1a67e8/raw/5090e812736071d77e31ed568cbf6ecbd439f6bf/hab_service_helper.sh)"
+source <(curl -s https://gist.githubusercontent.com/lancewf/584ca17c7b50cfc859e7cf544c1a67e8/raw/5090e812736071d77e31ed568cbf6ecbd439f6bf/hab_service_helper.sh)
+
 export REDIS_PORT=6379;
-export REQUESTBIN_PORT=8080;
+export PORT=8080;
+export SERVICE_NAME="requestbin"
 
-function start() {
-  install_if_missing core/busybox-static netstat;
-  netstat -an | grep $REQUESTBIN_PORT | grep LISTEN >/dev/null 2>/dev/null
-  if [ $? == 0 ]; then
-    echo "requestbin is already running";
-    return;
-  fi
+echo "Run 'start' to start the service"
 
-  start_sup
+function get_binds() {
+  echo "--bind redis:redis.default"
+}
 
+function start_binds() {
   start_redis
+}
 
-  build
-  
+function create_config() {
   mkdir -p /hab/user/requestbin/config/
-
-  printf "[http.listen]\nport = $REQUESTBIN_PORT" > /hab/user/requestbin/config/user.toml
-
-  hab start $HAB_ORIGIN/requestbin --bind redis:redis.default
-
-  wait_or_fail_for_port_to_listen $REQUESTBIN_PORT
+  printf "[http.listen]\n host = \"0.0.0.0\"\n port = $PORT\n local_only=false\n\n" > /hab/user/$SERVICE_NAME/config/user.toml
 }
 
 function start_redis() {
@@ -39,16 +38,11 @@ function start_redis() {
     return;
   fi
 
-  start_sup
-
   mkdir -p /hab/user/redis/config/
 
   printf "port = $REDIS_PORT\n" > /hab/user/redis/config/user.toml
 
-  hab start lancewf/redis
+  hab svc load lancewf/redis
 
   wait_or_fail_for_port_to_listen $REDIS_PORT
 }
-
-
-eval "$(curl -s -L https://gist.githubusercontent.com/lancewf/6b58d3accb36c2ae5681a40bd574b124/raw/345232f9fab0bb2892be15419bc5e644e55f0d9c/hab_studio_addition)"
